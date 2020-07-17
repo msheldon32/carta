@@ -173,7 +173,7 @@ def start_review_session(decks, reviews):
 	if review_type == 0:
 		review = get_review_by_type(reviews, deck_to_review, "simple")
 		if review is None:
-			review = carta.Review(deck_to_review, carta.StatusScheme.DefaultScheme(), "simple")
+			review = carta.Review(deck_to_review, carta.StatusScheme(), "simple")
 			reviews.append(review)
 		review_session = review.start_new_review_session()
 		while review_session.review_next_card() != -1:

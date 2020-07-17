@@ -162,7 +162,7 @@ def create_review_from_dict(deck_dict, review_dict):
 	elif review_dict["status_type"] == "streak":
 		return carta_review_schemes.DefaultStreakReview(deck_dict[review_dict["deck_num"]], review_dict["review_type"])
 	else:
-		return carta.Review(deck_dict[review_dict["deck_num"]], carta.StatusScheme.DefaultScheme(), review_dict["review_type"])
+		return carta.Review(deck_dict[review_dict["deck_num"]], carta.StatusScheme(), review_dict["review_type"])
 
 def load_from_file(input_file_location):
 	"""Recalls the JSON file from save_data() and creates objects from the existing data.

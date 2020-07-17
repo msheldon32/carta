@@ -139,64 +139,6 @@ class StatusScheme:
 				self.transform_status = lambda status, change: status
 		else:
 			self.transform_status = transform_status
-	
-	@classmethod
-	def LeitnerUpdate(cls,current_status, status_update, max_status="none"):
-		"""Updates according to the Leitner system.
-			- each card has an integer status
-			- lowest statuses are reviewed more often
-			- status increments by one on correct identification
-			- status decrements by one on incorrect identification
-			- status cannot be lower than 1
-		"""
-		assert (type(current_status) == int)
-		assert (type(status_update) == bool)
-		has_max = True
-		if type(max_status) == str:
-			if max_status == "none":
-				has_max = False
-		if (current_status == 1 and not status_update):
-			return current_status
-		elif has_max:
-			if current_status >= max_status:
-				return max_status
-		return current_status + (1 if status_update else -1)
-	
-	@classmethod
-	def StreakUpdate(cls,current_status, status_update, max_status="none"):
-		"""Updates according to the card's streak.
-			- each card has an integer status
-			- lowest statuses are reviewed more often
-			- status increments by one on correct identification
-			- status resets to 1 on failure
-			- status cannot be lower than 1
-		"""
-		assert (type(current_status) == int)
-		assert (type(status_update) == bool)
-		has_max = True
-		if type(max_status) == str:
-			if max_status == "none":
-				has_max = False
-		if (current_status == 1 and not status_update):
-			return current_status
-		elif has_max:
-			if current_status >= max_status:
-				return max_status
-		return (current_status + 1) if status_update else 1
-	
-	@classmethod
-	def LeitnerScheme(cls, max_status="none"):
-		"""Implements the Leitner method. 
-		"""
-		return StatusScheme(scheme_name="leitner", transform_status=(lambda cs, su: StatusScheme.LeitnerUpdate(cs, su, max_status)))
-	
-	@classmethod
-	def StreakScheme(cls, max_status="none"):
-		return StatusScheme(scheme_name="streak", transform_status=(lambda cs, su: StatusScheme.StreakUpdate(cs, su, max_status)))
-	
-	@classmethod
-	def DefaultScheme(cls):
-		return StatusScheme(scheme_name="default", transform_status="default")
 
 class CardReviewStatus:
 	"""CardReviewStatus -
