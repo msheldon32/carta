@@ -108,12 +108,44 @@ class TestReviewSession(unittest.TestCase):
     #     - not fetch new cards upon deactivation
     #     - not fetch new cards when reaching the end of the deck
     #     - automatically update review statuses
-    pass
+    def grab_review(self):
+        self.default_ds = carta_local.CsvDataSource("countries.csv")
+        self.default_dset = carta.DataSet(self.default_ds)
+        self.sample_deck = carta.Deck(self.default_dset, "Name", "Capital", carta.CardDisplayScheme())
+        deck_length = self.sample_deck.num_cards()
+        empty_ss = carta.StatusScheme()
+        self.sample_review = carta.Review(self.sample_deck, empty_ss, "simple", max_cards_per_session=deck_length+10)
+        self.sample_review_session = self.sample_review.start_new_review_session()
+        
+    def setUp(self):
+        self.grab_review()
+    
+    def test_deactivation(self):
+        self.grab_review()
+        self.sample_review_session.deactivate()
+        self.assertTrue(self.sample_review_session.review_next_card() == -1)
+
+    def test_finish(self):
+        self.grab_review()
+        for i in range(0, self.sample_deck.num_cards()):
+            self.sample_review_session.review_next_card()
+        self.assertTrue(self.sample_review_session.review_next_card() == -1)
 
 class TestSimpleReviewSession(unittest.TestCase):
     # a simple review session object should:
     #     - not update the review statuses whatsoever
-    pass
+    def test_simple_review(self):
+        default_ds = carta_local.CsvDataSource("countries.csv")
+        default_dset = carta.DataSet(default_ds)
+        sample_deck = carta.Deck(default_dset, "Name", "Capital", carta.CardDisplayScheme())
+        empty_ss = carta.StatusScheme()
+        sample_review = carta.Review(sample_deck, empty_ss, "simple")
+        sample_review_session = sample_review.start_new_review_session()
+        while sample_review_session.review_next_card() != -1:
+            prev_status = sample_review_session.get_review_status()
+            sample_review_session.update_review_status_from_result("test")
+            next_status = sample_review_session.get_review_status()
+            self.assertTrue(prev_status == next_status)
 
 class TestMultipleChoiceReviewSession(unittest.TestCase):
     # a multiple choice review session object should:
@@ -121,15 +153,58 @@ class TestMultipleChoiceReviewSession(unittest.TestCase):
     #           - these options should contain the correct answer
     #           - the number of options should be less than or equal to the proper amount
     #           - the number of options should only be less than the amount given if there aren't enough cards in the deck
+    #           - no option is repeated
     #     - check the answer
     #     - properly update the review status of the reviewed card
-    pass
+    def test_multichoice_review(self):
+        default_ds = carta_local.CsvDataSource("countries.csv")
+        default_dset = carta.DataSet(default_ds)
+        sample_deck = carta.Deck(default_dset, "Name", "Capital", carta.CardDisplayScheme())
+        empty_ss = carta.StatusScheme()
+        sample_review = carta.Review(sample_deck, empty_ss, "multiple_choice")
+        sample_review_session = sample_review.start_new_review_session()
+        try_correct = True
+        
+        while sample_review_session.review_next_card() != -1:
+            options = sample_review_session.generate_options()
+            correct_answer = sample_review_session.deck.render_back(card=sample_review_session.get_current_card())
+            self.assertTrue(len(options) <= sample_review_session.num_options)
+            self.assertTrue(correct_answer in options)
+
+            # this will never occur. will need to add new data sets for testing.
+            if sample_review_session.deck.num_cards() < sample_review_session.num_options:
+                self.assertTrue(len(options) < sample_review_session.num_options)
+
+            dup_options = []
+            for option in options:
+                self.assertTrue(option not in dup_options)
+                dup_options.append(option)
+                
+            if try_correct:
+                # try correct answer
+                try_correct = False
+                correct_idx = options.index(correct_answer)
+                self.assertTrue(sample_review_session.check_answer(options[correct_idx]))
+            else:
+                # try false answer
+                try_correct = True
+                correct_idx = options.index(correct_answer)
+                incorrect_idx = (correct_idx+1) % len(options)
+                self.assertFalse(sample_review_session.check_answer(options[incorrect_idx]))
 
 class TestInputReviewSession(unittest.TestCase):
     # a test input review session object should:
     #     - check the answer properly
     #            - ensure that whitespace and punctuation shouldn't make an impact
-    pass
+    def test_input_review(self):
+        default_ds = carta_local.CsvDataSource("countries.csv")
+        default_dset = carta.DataSet(default_ds)
+        sample_deck = carta.Deck(default_dset, "Name", "Capital", carta.CardDisplayScheme())
+        empty_ss = carta.StatusScheme()
+        sample_review = carta.Review(sample_deck, empty_ss, "input")
+        sample_review_session = sample_review.start_new_review_session()
+        while sample_review_session.review_next_card() != -1:
+            pass
 
 class TestReview(unittest.TestCase):
     # a review object should:
@@ -159,7 +234,24 @@ class TestDeck(unittest.TestCase):
     #      [not implemented]
     #     - push data to a data set object if specified
     #     - render cards based on an attached display scheme
-    #     - shuffle itself
+    def test_rendering(self):
+        default_ds = carta_local.CsvDataSource("countries.csv")
+        default_dset = carta.DataSet(default_ds)
+        sample_display_scheme = carta.CardDisplayScheme()
+        sample_deck = carta.Deck(default_dset, "Name", "Capital", sample_display_scheme)
+        for i, card in enumerate(sample_deck.cards):
+            self.assertTrue(sample_deck.render_front(index=i) == sample_display_scheme.render_front(card.front_side))
+            self.assertTrue(sample_deck.render_back(index=i) == sample_display_scheme.render_back(card.back_side))
+
+class TestDefaultStreakReview(unittest.TestCase):
+    # a default streak review object should:
+    # -
+    pass
+
+class TestDefaultLeitnerReview(unittest.TestCase):
+    # a default leitner review object should:
+    # -
+    pass
 
 if __name__ == "__main__":
     unittest.main()
