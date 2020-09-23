@@ -302,6 +302,7 @@ class MultipleChoiceReviewSession(ReviewSession):
         def check_answer(self, answer):
                 """Check if the selected option is correct. Note that this is based on rendered values.
                 """
+                self.current_answer = self.deck.render_back(card=self.get_current_card())
                 res = (answer == self.current_answer)
                 self.update_review_status_from_result(res)
                 return res
