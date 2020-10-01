@@ -245,15 +245,22 @@ class ReviewSession:
                 self.review_statuses = [status_obj for status_obj in self.review_statuses if status_obj.card != current_card]
                 self.review_statuses.append(CardReviewStatus(current_card, self, self.status_scheme, status=status))
         
-        def update_review_status_from_result(self, res):
+        def update_review_status_from_result(self, res, callback="none"):
                 """Uses a special "res" value - usually a Boolean involving whether or not the answer is correct -
                      to update the status of a card. The given review scheme should handle the logic here.
+                     
+                     Callback - can call another function based on the result.
                 """
+                if type(callback) == str:
+                	if callback == "none":
+                		callback = (lambda x: x)
+                		
                 review_status = self.get_review_status(self.get_current_card())
                 if review_status is None:
                         review_status = CardReviewStatus(self.get_current_card(), self.review, self.status_scheme, status="default")
                 else:
                         review_status.update_status(res)
+                callback(review_status)
                 
         def check_answer(self, answer):
                 return True
@@ -299,12 +306,12 @@ class MultipleChoiceReviewSession(ReviewSession):
                 self.current_options = values
                 return self.current_options
         
-        def check_answer(self, answer):
+        def check_answer(self, answer, status_callback="none"):
                 """Check if the selected option is correct. Note that this is based on rendered values.
                 """
                 self.current_answer = self.deck.render_back(card=self.get_current_card())
                 res = (answer == self.current_answer)
-                self.update_review_status_from_result(res)
+                self.update_review_status_from_result(res, status_callback)
                 return res
 
 class InputReviewSession(ReviewSession):
@@ -319,11 +326,11 @@ class InputReviewSession(ReviewSession):
                 """
                 return in_str.lower().replace(" ", "").replace(".", "").replace(",", "")
         
-        def check_answer(self, answer):
+        def check_answer(self, answer, status_callback="none"):
                 """Insures the normalized rendered value given matches the correct answer.
                 """
                 res = (self.normalize(answer) == self.normalize(self.deck.render_back(card=self.get_current_card())))
-                self.update_review_status_from_result(res)
+                self.update_review_status_from_result(res, status_callback)
                 return res
         
         def get_correct_answer(self):
