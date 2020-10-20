@@ -189,7 +189,7 @@ class ReviewSession:
                 self.review = review
                 self.deck = self.review.deck
                 self.review_indices = review_indices
-                self.current_index = -1
+                self.current_index = 0
                 self.review_statuses = review_statuses
                 self.max_cards = self.review.max_cards_per_session
                 

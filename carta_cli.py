@@ -176,11 +176,15 @@ def start_review_session(decks, reviews):
                         review = carta.Review(deck_to_review, carta.StatusScheme(), "simple")
                         reviews.append(review)
                 review_session = review.start_new_review_session()
-                while review_session.review_next_card() != -1:
+                
+                while True:
                         display_card_side(review_session.get_current_card(),deck_to_review, "front")
                         input()
                         display_card_side(review_session.get_current_card(),deck_to_review, "back")
                         input()
+                        
+                        if review_session.review_next_card() == -1:
+                        	break;
                 clear_screen()
         elif review_type == 1:
                 review = get_review_by_type(reviews, deck_to_review, "multiple_choice")
@@ -188,7 +192,8 @@ def start_review_session(decks, reviews):
                         review = carta_review_schemes.DefaultLeitnerReview(deck_to_review, "multiple_choice")
                         reviews.append(review)
                 review_session = review.start_new_review_session()
-                while review_session.review_next_card() != -1:
+                
+                while True:
                         starting_status = review_session.get_review_status()
                         if starting_status is None:
                                 starting_status = ""
@@ -205,6 +210,9 @@ def start_review_session(decks, reviews):
                         else:
                                 correct_value = review_session.current_answer
                                 input("Incorrect! Answer {} ({}) is correct".format(options.index(correct_value), correct_value))
+                                
+                        if review_session.review_next_card() == -1:
+                        	break;
                 clear_screen()
         elif review_type == 2:
                 review = get_review_by_type(reviews, deck_to_review, "input")
@@ -212,7 +220,8 @@ def start_review_session(decks, reviews):
                         review = carta_review_schemes.DefaultLeitnerReview(deck_to_review, "input")
                         reviews.append(review)
                 review_session = review.start_new_review_session()
-                while review_session.review_next_card() != -1:
+                
+                while True:
                         starting_status = review_session.get_review_status()
                         if starting_status is None:
                                 starting_status = ""
@@ -226,6 +235,9 @@ def start_review_session(decks, reviews):
                         else:
                                 correct_value = review_session.get_correct_answer()
                                 input("Incorrect! {} is correct".format(correct_value))
+                                
+                        if review_session.review_next_card() == -1:
+                        	break;
                 
 
 def command_loop():
