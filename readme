@@ -1,0 +1,3 @@
+# Carta
+
+Carta is a personal spaced-repition project. The goal is data-first learning - where the user attempts to learn a full data set in its entirety through spaced repetition. Flashcards are created, deleted, and updated based on changes in the data. Relations between cards are dependent on relations within the data itself.
