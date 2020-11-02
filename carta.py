@@ -185,19 +185,15 @@ class CardReviewStatus:
 class ReviewSession:
         """Allows the user to interact with the deck. Prototype object.
         """
-        def __init__(self, review, review_statuses = "none", review_indices="whole_deck_random"):
+        def __init__(self, review, review_indices="whole_deck_random"):
                 self.review = review
                 self.deck = self.review.deck
-                self.review_indices = review_indices
+                self.review_indices = self.review.review_statuses
                 self.current_index = 0
                 self.review_statuses = review_statuses
                 self.max_cards = self.review.max_cards_per_session
                 
                 self.is_active = True
-                
-                if type(review_statuses) == str:
-                        if review_statuses == "none":
-                                self.review_statuses = []
                                 
                 self.status_scheme = self.review.status_scheme
                 if type(review_indices) == str:
@@ -276,10 +272,10 @@ class MultipleChoiceReviewSession(ReviewSession):
         """MultipleChoiceReviewSession -
                 Multiple choice review
         """
-        def __init__(self, review,  num_options=4, review_statuses="none", review_indices="whole_deck_random"):
+        def __init__(self, review,  num_options=4, review_indices="whole_deck_random"):
                 assert(num_options > 1)
                 
-                super().__init__(review, review_statuses=review_statuses, review_indices=review_indices)
+                super().__init__(review, review_indices=review_indices)
                 self.current_answer = -1
                 self.current_options = []
                 self.num_options = num_options
@@ -318,8 +314,8 @@ class InputReviewSession(ReviewSession):
         """InputReviewSession -
                 Uses user input to validate 
         """
-        def __init__(self, review, review_statuses="none", review_indices="whole_deck_random"):
-                super().__init__(review, review_statuses=review_statuses, review_indices=review_indices)
+        def __init__(self, review, review_indices="whole_deck_random"):
+                super().__init__(review, review_indices=review_indices)
         
         def normalize(self, in_str):
                 """Normalization for proper input comparison.
@@ -344,8 +340,10 @@ class Review:
                         - with seperate statuses for each card. In this case, two Review objects should be created.
                 
                 deck (Deck) - underlying deck to review
-                status_type - type of status. Right now, the only valid options are "default" (basic review type with no active
+                status_type (string) - type of status. Right now, the only valid options are "default" (basic review type with no active
                         participation on the part of the user), and "leitner" (reflecting the Leitner system of flashcard review)
+                review_type (string) - what kind of review this might be. Current options: multiple choice or input.
+                max_cards_per_session (int) - number of cards to review during each review session.
                 review_statuses (list of CardReviewStatuses) - saves the review statuses for each card IN REVIEW. If a card has not been
                         added to the review, no review_status should exist.
         """

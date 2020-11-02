@@ -1,19 +1,14 @@
 import tkinter as tk
 import carta
 import carta_local
+import interaction
+import carta_review_schemes
 
-class CartaSession:
-	def __init__(self):
-		carta_data = carta.load_from_file("carta_data.json")
-		self.data_sets = carta_data["data_sets"]
-		self.decks = carta_data["decks"]
-		self.reviews = carta_data["reviews"]
-
-class DataSourceMenu(tk.Frame):
-	def __init__(self, session, master=None):
+class DataSourceMenuWindow(tk.Frame):
+	def __init__(self, menu_obj, master=None):
 		super().__init__(master)
 		
-		self.session = session
+		self.menu_obj = menu_obj
 		self.refresh_vars()
 		
 		self.pack()
@@ -39,31 +34,29 @@ class DataSourceMenu(tk.Frame):
 		self.edit_button.grid(row=1, column=1)
 		self.delete_button.grid(row=2, column=1)
 		
-class CartaMainMenu(tk.Frame):
-	def __init__(self, session, master=None):
+class CartaMainMenuWindow(tk.Frame):
+	def __init__(self, menu_obj, master=None):
 		super().__init__(master)
 		
-		self.session = session
+		self.menu_obj = menu_obj
 		
 		self.pack()
 		self.create_widgets()
 		
 	def create_widgets(self):
-		self.data_set_button = tk.Button(self)
-		self.data_set_button["text"] = "Data Sets"
-		self.data_set_button["command"] = (lambda: DataSourceMenu(self.session, self.master))
-		
-		self.deck_button = tk.Button(self)
-		self.deck_button["text"] = "Decks"
-		
-		self.review_button = tk.Button(self)
-		self.review_button["text"] = "Review"
-		
-		self.data_set_button.grid(row=0, column=0)
-		self.deck_button.grid(row=0, column=1)
-		self.review_button.grid(row=1, column=0)
+                self.data_set_button = tk.Button(self)
+                self.data_set_button["text"] = "Data Sets"
+                self.data_set_button["command"] = (lambda: DataSourceMenu(self.session, self.master))
+                
+                self.deck_button = tk.Button(self)
+                self.deck_button["text"] = "Decks"
+                
+                self.data_set_button.grid(row=0, column=0)
+                self.deck_button.grid(row=0, column=1)
 
 if __name__=="__main__":
-	root = tk.Tk()
-	main_menu = CartaMainMenu(CartaSession(), master=root)
-	main_menu.mainloop()
+        data_state = interaction.DataState("carta_data.p")
+        main_menu = interaction.MainMenu(data_state)
+        root = tk.Tk()
+        main_menu_window = CartaMainMenuWindow(main_menu, master=root)
+        main_menu_window.mainloop()
