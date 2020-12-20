@@ -5,13 +5,15 @@ import os
 import datetime
 import re
 import xlrd
-import carta
-import carta_review_schemes
 import dill
+
+import data
+import deck
+import review_scheme
 
 DEFAULT_DATETIME_REP = "%m/%d/%Y, %H:%M:%S"
 
-class CsvDataSource(carta.DataSource):
+class CsvDataSource(data.DataSource):
         """Pulls/pushes data from a csv file. Uses header and standard delimitation settings. 
         """
         def __init__(self, file_name, read_only=True):
@@ -60,7 +62,7 @@ class CsvDataSource(carta.DataSource):
         def get_source_str(self):
                 return self.file_name
 
-class ExcelDataSource(carta.DataSource):
+class ExcelDataSource(data.DataSource):
         """Read-only data source for Excel files.
         """
         def __init__(self, file_name):
@@ -93,22 +95,36 @@ class ExcelDataSource(carta.DataSource):
         def get_source_str(self):
                 return self.file_name
         
-def save_data(data_sets, deck_list, review_list, output_file_location):
+def save_data(data_sets, decks, output_file_location):
         """Creates a JSON file describing all relevant objects.
         """
-        data_sources = [data_set.data_source for data_set in data_sets]
+        data_sources = list(set([data_set.data_source for data_set in data_sets]))
+        cards = []
+        for deck in decks:
+        	cards.append(list(set([card for card in deck.cards])))
+        review_schemes = list(set([deck.review_scheme for deck in decks]))
         
         full_dict = {
                 "data_sources": data_sources,
                 "data_set": data_sets,
-                "decks": deck_list,
-                "reviews": review_list
+                "decks": decks,
+                "cards": cards,
+                "review_schemes": review_schemes
         }
 
         dill.dump(full_dict, open(output_file_location, "wb"))
 
 def load_from_file(input_file_location):
-        """RECALLS the JSON file from save_data() and creates objects from the existing data.
+        """Recalls the JSON file from save_data() and creates objects from the existing data.
         """
 
         return dill.load(open(input_file_location, "rb"))
+
+def create_data_source(file_location):
+    extention = file_location.split(".")[-1]
+    if (extention == "csv"):
+        return CsvDataSource(file_location)
+    elif (extention == "xlsx"):
+        return ExcelDataSource(file_location)
+    else:
+        raise Exception("Invalid extention {}".format(extention))
