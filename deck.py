@@ -21,6 +21,15 @@ class ReviewScheme:
 	
 	def status_update(self, card):
 		return card.status
+	
+	def get_options(self, n, correct_answer, deck):
+		output = [correct_answer]
+		while len(output) < n:
+			temp = deck.get_random_card().back_side
+			if temp not in output:
+				output.append(temp)
+		random.shuffle(output)
+		return output
 
 class Card:
         """Card -
@@ -106,6 +115,9 @@ class Deck:
                         if (card.front_side == front_side and card.back_side == back_side):
                                 return card
                 return None
+                
+        def get_cards_to_review(self):
+        	return review_scheme.get_cards_to_review(self)
 
         def num_cards(self):
                 return len(self.cards)
