@@ -62,8 +62,7 @@ class Deck:
                 self.cards = []
                 if type(filter_fn) == str:
                         self.filter_fn = (lambda x: True)
-
-		if initialize:
+                if initialize:
 	                self.refresh_data()
 
         def load_data_from_source(self):
