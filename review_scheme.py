@@ -23,7 +23,7 @@ class LeitnerReviewScheme(deck.ReviewScheme):
 	
 	def get_cards_to_review(self, deck):
 		out_cards = []
-		new_cards = 0
+		new_cards = 0	
 		for card in deck.cards:
 			if (card.status == -1) and (new_cards < self.new_cards_per_session):
 				out_cards.append(card)

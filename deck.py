@@ -52,7 +52,7 @@ class Card:
 class Deck:
         """Basic deck object deriving cards from a data set
         """
-        def __init__(self, parent, front_side, back_side, review_scheme_obj, filter_fn="none"):
+        def __init__(self, parent, front_side, back_side, review_scheme_obj, filter_fn="none", initialize=True):
                 self.parent = parent
                 self.parent.add_child(self)
                 self.review_scheme = review_scheme_obj
@@ -63,7 +63,8 @@ class Deck:
                 if type(filter_fn) == str:
                         self.filter_fn = (lambda x: True)
 
-                self.refresh_data()
+		if initialize:
+	                self.refresh_data()
 
         def load_data_from_source(self):
                 """Pull from the DataSet object. For refreshing data or initializaing independent decks.
