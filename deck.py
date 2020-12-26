@@ -86,7 +86,7 @@ class Deck:
                 # update and delete any cards
                 for card in self.cards:
                         for subarray in underlying_data:
-                                if subarray[0] == card.front:
+                                if subarray[0] == card.front_side:
                                         card.back = subarray[1]
                                         if self.filter_fn(card):
                                                 new_cards.append(card)
