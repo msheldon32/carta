@@ -117,7 +117,7 @@ class Deck:
                 return None
                 
         def get_cards_to_review(self):
-        	return review_scheme.get_cards_to_review(self)
+        	return self.review_scheme.get_cards_to_review(self)
 
         def num_cards(self):
                 return len(self.cards)
