@@ -19,7 +19,11 @@ class LeitnerReviewScheme(deck.ReviewScheme):
 		status_dt = card.status_dt
 		status    = card.status
 		update_dt = status_dt + datetime.timedelta(days=(status*self.days_per_status))
-		return (update_dt <= datetime.datetime.now()) and (status != -1)
+		if update_dt.tzinfo is not None:
+			comp_time = datetime.datetime.now(update_dt.tzinfo)
+			return (update_dt <= comp_time) and (status != -1)
+		else:
+			return (update_dt <= datetime.datetime.now()) and (status != -1)
 	
 	def get_cards_to_review(self, deck):
 		out_cards = []
@@ -49,7 +53,11 @@ class StreakReviewScheme(deck.ReviewScheme):
 		status_dt = card.status_dt
 		status    = card.status
 		update_dt = status_dt + datetime.timedelta(days=(status*self.days_per_status))
-		return (update_dt <= datetime.datetime.now()) and (status != -1)
+		if update_dt.tzinfo is not None:
+			comp_time = datetime.datetime.now(update_dt.tzinfo)
+			return (update_dt <= comp_time) and (status != -1)
+		else:
+			return (update_dt <= datetime.datetime.now()) and (status != -1)
 	
 	def get_cards_to_review(self, deck):
 		out_cards = []
