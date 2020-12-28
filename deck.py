@@ -43,12 +43,17 @@ class Card:
                 status_dt: datetime that the status was last updated.
 
         """
-        def __init__(self, front_side, back_side, status, parent):
+        def __init__(self, front_side, back_side, status, parent, status_dt="now"):
                 self.front_side = front_side
                 self.back_side  = back_side
                 self.status     = status
-                self.status_dt  = datetime.datetime.now()
-                self.parent     = parent
+                
+                self.status_date = status_dt
+                if type(self.status_dt) == str:
+                	if self.status_dt == "now":
+		                self.status_dt  = datetime.datetime.now()
+		                
+                self.parent = parent
 
         def flipped_card(self):
                 return Card(self.back_side, self.front_side)

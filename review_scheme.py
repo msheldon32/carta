@@ -34,8 +34,7 @@ class LeitnerReviewScheme(deck.ReviewScheme):
 	
 	def status_update(self, success, card):
 		if card.status in [-1, 0]:
-			card.status = 1 if success else 0
-			return
+			return 1 if success else 0
 		return card.status + (1 if success else -1)
 
 
