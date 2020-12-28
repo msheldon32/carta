@@ -48,7 +48,7 @@ class Card:
                 self.back_side  = back_side
                 self.status     = status
                 
-                self.status_date = status_dt
+                self.status_dt = status_dt
                 if type(self.status_dt) == str:
                 	if self.status_dt == "now":
 		                self.status_dt  = datetime.datetime.now()
